@@ -82,7 +82,7 @@ inputs{8} = Peak;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 opts = odeset('RelTol',1e-8,'AbsTol',1e-8,'MaxStep',60/86400);
 
-[t,y] = ode45(@B_3_12, [tspan], y0, opts, inputs);
+[t,y] = ode45(@Bleach, [tspan], y0, opts, inputs);
 
 % calculations for plotting:
 
@@ -108,73 +108,62 @@ ROSpercell = y(:,12)./cells;
 expel = CSmaxbleachrate*max(0.0,(ROSpercell - ROSthreshold)./ROSthreshold)*ROSthreshold;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Lukes edit to calculate the light same as is calculated in B_3_12
-Ed = 0;
-SunFactor = 1 - ShadeFactor;
-for i = 1:length(t)
-    time = t(i);
-    Light =Peak*max(0,sin((time-0.25-floor(time-0.25))*2*pi)); % W m-2
-        if (ShadeTimes(1) < time - floor(time)) && (time - floor(time) < ShadeTimes(2))
-            Light = Light*SunFactor;
-        end
-    Ed(i) = Light;
-end
-%Edmax = 50;
-plot (t,Ed)
-%Ed = Edmax*max(0,sin((t-0.25-floor(t-0.25))*2*pi));
+
+Edmax = Peak;
+Ed = Edmax*max(0,sin((t-0.25-floor(t-0.25))*2*pi));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% rctotal = sum(y(:,9:11),2);
-% 
-% 
-% figure(1)
-% subplot(231)
-% pp = plot(t,y(:,[1]), 'LineWidth', 2);
-% ylabel('Zooxanthallae Biomass (mg N m-2)','FontSize', 8);
-% xlim([0 26])
-% title ('24 h shade','FontSize',8)
-% %text(0.04,0.99,'A','Units', 'Normalized', 'VerticalAlignment', 'Top','FontSize',12)
-% %xticklabels({})
-% 
-% 
-% 
-% figure(1)
-% subplot(232)
-% pp = plot(t,y(:,[2:4 1]), 'LineWidth', 2); % y contains 15 variables 
-% legend(pp, 'RN', 'RP', 'RC','CS_N');
-% title('Symbiont biomass','FontSize', 16);
-% ylabel('Reserves','FontSize', 16);
-% xlabel('Time [days]', 'FontSize', 16);
-% 
-% subplot(233)
-% pp2 = plot(t, [y(:,2)./y(:,1) y(:,3)./y(:,1)/(((1/16)*(30.97/14.01))) y(:,4)./y(:,1)/(((106/16)*(12.01/14.01)))], 'LineWidth', 2);
-% lgnd = legend(pp2, 'N [mg N]', 'P [dimensionless]', 'C [dimensionless]', 'Location','northeast');
-% lgnd.FontSize = 6;
-% xlim([0 26])
-% ylim([0 1.2])
-% ylabel('Normalised reserves','FontSize', 8);
-% text(0.04,0.99,'D','Units', 'Normalized', 'VerticalAlignment', 'Top','FontSize',12)
-% xticklabels({})
-% 
-% 
-% 
-% subplot(234)
-% pp = plot(t,y(:,6:8), 'LineWidth', 2); % y contains 15 variables 
-% legend(pp, 'Chl', 'Xp','Xh');
-% title('Pigments', 'FontSize', 16);
-% ylabel('Pigments','FontSize', 16);
-% xlabel('Time [days]', 'FontSize', 16);
-% 
-% subplot(235)
-% pp = plot(t,y(:,9)./rctotal,t,y(:,10)./rctotal,t,y(:,11)./rctotal, 'LineWidth', 2); % y contains 15 variables 
-% ll = legend(pp, 'Qox', 'Qred', 'Qin');
-% title('Reaction centres', 'FontSize', 16);
-% ylabel('Fraction in each state','FontSize', 16);
-% xlabel('Time [days]', 'FontSize', 16);
-% 
-% subplot(236)
-% 					  
+ rctotal = sum(y(:,9:11),2);
+ 
+ 
+ figure(1)
+ subplot(231)
+ pp = plot(t,y(:,[1]), 'LineWidth', 2);
+ ylabel('Zooxanthallae Biomass (mg N m-2)','FontSize', 8);
+ xlim([0 26])
+ title ('24 h shade','FontSize',8)
+ %text(0.04,0.99,'A','Units', 'Normalized', 'VerticalAlignment', 'Top','FontSize',12)
+ %xticklabels({})
+ 
+ 
+ 
+ figure(1)
+ subplot(232)
+ pp = plot(t,y(:,[2:4 1]), 'LineWidth', 2); % y contains 15 variables 
+ legend(pp, 'RN', 'RP', 'RC','CS_N');
+ title('Symbiont biomass','FontSize', 16);
+ ylabel('Reserves','FontSize', 16);
+ xlabel('Time [days]', 'FontSize', 16);
+ 
+ subplot(233)
+ pp2 = plot(t, [y(:,2)./y(:,1) y(:,3)./y(:,1)/(((1/16)*(30.97/14.01))) y(:,4)./y(:,1)/(((106/16)*(12.01/14.01)))], 'LineWidth', 2);
+ lgnd = legend(pp2, 'N [mg N]', 'P [dimensionless]', 'C [dimensionless]', 'Location','northeast');
+ lgnd.FontSize = 6;
+ xlim([0 26])
+ ylim([0 1.2])
+ ylabel('Normalised reserves','FontSize', 8);
+ text(0.04,0.99,'D','Units', 'Normalized', 'VerticalAlignment', 'Top','FontSize',12)
+ xticklabels({})
+ 
+ 
+ 
+ subplot(234)
+ pp = plot(t,y(:,6:8), 'LineWidth', 2); % y contains 15 variables 
+ legend(pp, 'Chl', 'Xp','Xh');
+ title('Pigments', 'FontSize', 16);
+ ylabel('Pigments','FontSize', 16);
+ xlabel('Time [days]', 'FontSize', 16);
+ 
+ subplot(235)
+ pp = plot(t,y(:,9)./rctotal,t,y(:,10)./rctotal,t,y(:,11)./rctotal, 'LineWidth', 2); % y contains 15 variables 
+ ll = legend(pp, 'Qox', 'Qred', 'Qin');
+ title('Reaction centres', 'FontSize', 16);
+ ylabel('Fraction in each state','FontSize', 16);
+ xlabel('Time [days]', 'FontSize', 16);
+ 
+ subplot(236)
+ 					  
 pp = plot(t,ROSpercell,t,expel,t,ROSthreshold*ones(size(t)),'LineWidth',2); % y contains 15 variables 
 ylabel('ROS per cell, Expulsion','FontSize', 8);
 xlabel('Time (d)', 'FontSize', 8);
@@ -187,17 +176,17 @@ ylim = get(gca,'ylim');
 text(xlim(1) + 0.4*diff(xlim),ylim(1) + 0.53*diff(ylim),['Thres = ',num2str(ROSthreshold)]);
 text(0.04,0.99,'G','Units', 'Normalized', 'VerticalAlignment', 'Top','FontSize',12)
 
-% 			 
-% 					  
-% subplot(236) % opaqueness of the cell
-% pp = plot(t,aA/rCS/rCS/pi, t, nChl2C, t,Ed/Peak,'LineWidth', 2); % y contains 15 variables 
-% title('Opaqueness and C:Chl', 'FontSize', 16);
-% ylabel('[\alpha / PA],[norm. C:Chl,[norm. Ed]');
-% xlabel('Time [days]', 'FontSize', 16);
-% legend(pp,'opaq','norm Chl:C','norm Ed');
-% xlim = get(gca,'xlim');ylim = get(gca,'ylim');
-% text(xlim(1) + 0.2*diff(xlim),ylim(1) + 0.1*diff(ylim),['C:Chlmin = ',num2str(C2Chlmin)]);
-% 
-% set(gcf,'Position',[720 500 1005 598]);
-% eval(['print -dpng RB_3_12_',datestr(now,'dd-mmm-yyyy'),'.fig'])
-% 			  
+ 			 
+ 					  
+ subplot(236) % opaqueness of the cell
+ pp = plot(t,aA/rCS/rCS/pi, t, nChl2C, t,Ed/Peak,'LineWidth', 2); % y contains 15 variables 
+ title('Opaqueness and C:Chl', 'FontSize', 16);
+ ylabel('[\alpha / PA],[norm. C:Chl,[norm. Ed]');
+ xlabel('Time [days]', 'FontSize', 16);
+ legend(pp,'opaq','norm Chl:C','norm Ed');
+ xlim = get(gca,'xlim');ylim = get(gca,'ylim');
+ text(xlim(1) + 0.2*diff(xlim),ylim(1) + 0.1*diff(ylim),['C:Chlmin = ',num2str(C2Chlmin)]);
+ 
+ set(gcf,'Position',[720 500 1005 598]);
+ eval(['print -dpng RB_3_12_',datestr(now,'dd-mmm-yyyy'),'.fig'])
+ 			  
