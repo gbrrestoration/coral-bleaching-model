@@ -1,36 +1,62 @@
-function dydt = bleach(t, y, inputs)
+function dydt = bleach(t, y, forcings, params)
 
 % developed by Mark Baird and Julie Terp Jorgensen (2021).
 
 % Water column environmental conditions;
   
-% Extract 'inputs' variables created in run_bleach
-DIN_w = inputs{1};
-DIP_w = inputs{2};
-temp_timeseries = inputs{3};
-POM = inputs{4};
-salinity = inputs{5};
-tau = inputs{6};
-rho = inputs{7};
-Peak = inputs{8};
+% Extract 'forcings' variables created in run_bleach
+DIN_w = forcings{1};
+DIP_w = forcings{2};
+Temperature = forcings{3};
+POM = forcings{4};
+Salinity = forcings{5};
+tau = forcings{6};
+rho = forcings{7};
+Light = forcings{8};
 
+% If timeseries data is available, interpolates across timeseries
+Fnames = {'DIN_w', 'DIP_w','Light','Temperature'};
+for f = 1:length(Fnames)
+    if length(eval(Fnames{f})) > 1
+        dat = eval(Fnames{f});
+        eval(sprintf('%s = %g;',Fnames{f},interp1(dat(1,:),dat(2,:),t)));
+    end
+end
+clear Fnames dat f
+% Rename key variables
+Ed = Light;
+Tanomaly = Temperature;
 
-% Quick calculations
-Tanomaly = interp1(temp_timeseries(1,:),temp_timeseries(2,:),t); % Temperature anamoly at any time
-Ed =Peak*max(0,sin((t-0.25-floor(t-0.25))*2*pi)); % W m-2 % Light level at any time
+% Extract parameters from Run Bleach
+mN = params(1);  % Nitrogen content of zooxanthellae cells           (mg N cell-1)
+rCS = params(2);                        % Radius of zooxanthellae cells                     (m)
+CSvol = params(3);    % volume of the cell (m3)
+uCH = params(4);                     % Maximum growth rate of coral host                     (d-1)
+Spart = params(5);                    % Rate coefficient of particle capture              (m d-1)
+uCS = params(6);                      % Maximum growth rate of zooxanthellae              (d-1)
+zetaCH = params(7);                  % Quadratic mortality coefficient of polyps         (d-1 (g N m-2)-1)
+zetaCS = params(8);                  % Linear mortality of zooxanthellae                 (d-1) 
+CHremin = params(9);                   % Remineralised fraction of coral mortality 
+OCH = params(10);                      % Nitrogen-specific host area coefficient of polyps (m2 mg N-1)
+C2Chlmin = params(11);                  % max Chl:C ratio at which synthesis stops.    
 
-
-
-
+Chlmax = params(12);
+Xanth_tau = params(13); % 1 per 20 minutes %%72 times per day
+photon2rcii = params(14);
+ROSthreshold = params(15);
+photon2ros = params(16);
+chla2rcii = params(17);
+CSmaxbleachrate = params(18);
 
 
 a_rub = min(1.0,max(0,(1-exp(-(2-Tanomaly)))/(1-exp(-2))));
 
 % Parameters required for conversion to spectrally-resolved:
+%
+%c = 2.998e8;                % Speed of light                                    (m s-1)
+%h = 6.626e-34;             % Planck constant                                   (J s-1)
+%AV = 6.02e23;               % Avagadro constant                                 (mol-1)
 
-c = 2.998e8;                % Speed of light                                    (m s-1)
-h = 6.626e-34;             % Planck constant                                   (J s-1)
-AV = 6.02e23;               % Avagadro constant                                 (mol-1)
 
   
 dydt(1:length(y)) = 0; % this sets every derivative to 0 so I can progressively add to them.
@@ -56,37 +82,18 @@ Qtot = Qox + Qin + Qred;
 % Constant values table A.7 in Baird et al. 2018:
 
 D_N = 17.5e-10;              % Molecular diffusivity of NO3                      (m2 s-1)
-D_P = 8.46e-10;              % Molecular diffusivity of NO3                      (m2 s-1)
+D_P = 8.46e-10;              % Molecular diffusivity of PO4                      (m2 s-1)
 v = 1.05e-6;               % Kinematic viscosity of water                      (m2 s-1)
 
 % Conversion of W m-2 to mmol photon d-1 for light at 490 nm. 
   
 W2mmol_490 = 8.359335857479461e-9*490*1000*86400; %  = (1e9 h c)-1 / Av
 
-% Parameter values table A.7 in Baird et al. 2018:
-
-mN = 4.514805e-14*16*1000*14.01;  % Nitrogen content of zooxanthellae cells           (mg N cell-1)
-rCS = 5e-6;                        % Radius of zooxanthellae cells                     (m)
-CSvol = 4*pi/3*rCS^3;    % volume of the cell (m3)
-uCH = 0.05;                     % Maximum growth rate of coral host                     (d-1)
-Spart = 3.0;                    % Rate coefficient of particle capture              (m d-1)
-uCS = 0.4;                      % Maximum growth rate of zooxanthellae              (d-1)
-zetaCH = 0.0; %0.01;                  % Quadratic mortality coefficient of polyps         (d-1 (g N m-2)-1)
-zetaCS = 0.0;                  % Linear mortality of zooxanthellae                 (d-1) 
-CHremin = 0.5;                   % Remineralised fraction of coral mortality 
-OCH = 2.0/1000;                      % Nitrogen-specific host area coefficient of polyps (m2 mg N-1)
-C2Chlmin = 20;                  % max Chl:C ratio at which synthesis stops.    
+% 8.359335857479461e-9 == (1E+9 * h * c)-1 /Av
 
 % phi = 0.1                      % Fractional (of uCS) respiration rate
 
-Chlmax = 2.0*2.09e7 * ((1.0e18*CSvol)^-0.310);
 
-Xanth_tau = 72; % 1 per 20 minutes
-photon2rcii = 0.1e-6;
-ROSthreshold = 1.418e-14;
-photon2ros = 7000.0;
-chla2rcii = 0.002/893.49;
-CSmaxbleachrate = 1.0; % d-1
 
 % Schmidt number  = diffusivity momentum / diffusivity of nutrient ions
 
@@ -199,12 +206,7 @@ host_growth = host_growth - mucus2;
 
 mucus = mucus + mucus2;
 
-% check they are zero:
-									   
-translocate = 0;
-polypmort = 0;
-total_grazing = 0;
-host_growth = 0;
+
 									 
 % symbiont and host growth  
 
@@ -276,6 +278,7 @@ dydt(12) = dydt(12) - ARO + 0.5 * (Qin/Qtot) * absorb / photon2rcii / photon2ros
 
 ROSpercell = y(12)/cells;
 
+% Do we need a background expulsion rate? - MB
 expulsionrate = CSmaxbleachrate*min(1.0,max(0.0,(ROSpercell - ROSthreshold)/ROSthreshold));
 
 dydt(1) = dydt(1) - expulsionrate * y(1);
@@ -289,14 +292,13 @@ dydt(9) = dydt(9) - expulsionrate * y(9);
 dydt(10) = dydt(10) - expulsionrate * y(10);
 dydt(11) = dydt(11) - expulsionrate * y(11);
 dydt(12) = dydt(12) - expulsionrate * y(12);
-%dydt(13) = Ed;
 									 
 dydt = dydt';
 % Need to turn off derivatives if CS_N is less than 1000 times the ODE tolerance.
 
-if (y(1) < 1e-5)
- dydt = dydt*0;
-end
+%if (y(1) < 1e-5)
+% dydt = dydt*0;
+%end
 
 
 
