@@ -69,7 +69,7 @@ Salinity = 35;% Note that Salinity is not currently used in this model.
 
 % Input options for reading forcing data from files (overwrites above forcing variables)
 % Comment out for normal model usage 
-%file_path = 'C:/Users/luke_/Dropbox/Cloud Brightening Project/Scripts/Bleaching_submodel/Test_Data/';
+%file_path = 'C:/Users/Example/Bleaching_submodel/Test_Data/';
 %SDate = datetime(2021,11,28,0,0,0); % Starting datetime [format = (Year,Month,Day,Hour,Minute,Second)]
 %MMM = 26; %Maximum Monthly Mean for the corals you are modelling
 % This requires each recorded variable to be saved in individual csv files
