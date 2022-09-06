@@ -1,18 +1,22 @@
-# User Manual for Matlab 'Bleach' model 
+# User Manual for Matlab-based 'Coral Bleaching Model'. 
 This is a Matlab version of the coral bleaching model contained within the C-based 
 CSIRO Environmental Modelling Suite 
 [(GitHub - csiro-coasts/EMS: Environmental Modelling Suite)](https://github.com/csiro-coasts/EMS).
 
 In order to run this model the entire repository should be downloaded from GitHub:
-[(GitHub - gbrrestoration/coral-bleaching-model)](https://github.com/gbrrestoration/coral-bleaching-model).
-The 'Bleach' function can be added to Matlabs path by 'running' the function and accepting 'add to path' this then allows the 'Run_Bleach' script to call this function as necessary. All forcings and input variables are passed to the 'Bleach' function from 'Run_Bleach'. 'Plot_Bleach' has also been included as an easy way to plot some of the most relevant resultant data, this function is not necessary but is included as an aid for initial users.
+[(GitHub - gbrrestoration/coral-bleaching-model)](https://github.com/gbrrestoration/coral-bleaching-model). The repository contains two Matlab scripts and a Matlab function:
+- **Run_Bleach** - script that specifices the configuration of the model (initial conditions, forcings and parameters) and manages the run.
+- **Bleach** - function that contains the model equations. It is called by Run_Bleach.
+- **Plot_Bleach** - script that plots common model outputs after the model integration is complete. This script is not necessary but is included as an aid for initial users.
+
+The 'Bleach' function can be added to the Matlab path by 'running' the function and accepting 'add to path' this then allows the 'Run_Bleach' script to call this function as necessary. 
 
 Time in the model is specified in days and the limits are set in the variable 'tspan'.
 
-Inputs to the model are split into three categories: initial conditions, forcings, parameters
+Inputs to the model are split into three categories: initial conditions, forcings, parameters.
 
 **Initial Conditions:**
-Initial conditions are both the input and output variables of the model.
+Initial conditions for all are both the input and output variables of the model.
 
 **Forcings:**
 Primary forcing inputs can be input in the following manner:
