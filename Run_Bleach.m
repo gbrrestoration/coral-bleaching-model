@@ -139,6 +139,14 @@ forcings{6} = tau;
 forcings{7} = rho;
 forcings{8} = Light;
 
+% Check for non-finite values in forcings that will break 'Bleach' function
+for i=1:length(forcings)
+    if sum(sum(isfinite(forcings{i})<1)) > 0
+        index = find(isfinite(forcings{i})<1);
+        disp(strcat("Error: Forcings variable '",num2str(i),"' has a non finite value"))
+            return
+    end
+end
 
 % Parameters are collated into forcings variable for passing to Bleach function
 params(1) = mN;
