@@ -139,12 +139,18 @@ forcings{6} = tau;
 forcings{7} = rho;
 forcings{8} = Light;
 
-% Check for non-finite values in forcings that will break 'Bleach' function
+% Check for non-finite and repeated values in forcings that will break 'Bleach' function
 for i=1:length(forcings)
     if sum(sum(isfinite(forcings{i})<1)) > 0
         index = find(isfinite(forcings{i})<1);
         disp(strcat("Error: Forcings variable '",num2str(i),"' has a non finite value"))
             return
+    end
+    if length(forcings{i}(1,:)) ~= length(unique(forcings{i}(1,:)))
+        [v, w] = unique( forcings{i}(1,:), 'stable' );
+        duplicate_indices = setdiff( 1:numel(forcings{i}(1,:)), w );
+        disp(strcat("Error: Forcings variable '",num2str(i),"' has a repeated time point ",datestr(datetime((forcings{i}(1,duplicate_indices)+datenum(SDate)),'ConvertFrom','datenum'))))
+        return
     end
 end
 
