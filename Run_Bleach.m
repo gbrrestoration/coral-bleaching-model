@@ -119,6 +119,8 @@ if exist('file_path','var') == 1
         assignin('base',sprintf(nme),[time.'; data.']);
         clear dat time data nme
     end
+    Temperature(2,:) = Temperature(2,:) - MMM;
+    Temperature(2,Temperature(2,:)<0) = 0;
 end
 clear files filenames pth ext i
 
