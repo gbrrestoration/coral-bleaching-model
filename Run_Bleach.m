@@ -129,7 +129,7 @@ clear files filenames pth ext i
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Forcings are collated into forcings variable for passing to Bleach function
-forcings = cell(9,1); % This must be the right number, if more forcing variables are added
+forcings = cell(8,1); % This must be the right number, if more forcing variables are added
 forcings{1} = DIN_w;
 forcings{2} = DIP_w;
 forcings{3} = Temperature;
