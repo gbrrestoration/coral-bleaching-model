@@ -15,13 +15,39 @@
 close all 
 clear all
 
-tspan = [0 26]; % Days (integer format)
+tspan = [0 24]; % Days (integer format)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Input parameters here to allow for calculation of initial conditions
+% Parameter values table A.7 in Baird et al. 2018
+mN = 4.514805e-14*16*1000*14.01;  % Nitrogen content of zooxanthellae cells (mg N cell-1)
+rCS = 5e-6;                       % Radius of zooxanthellae cells (m)
+CSvol = 4*pi/3*rCS^3;             % volume of the cell (m3)
+uCH = 0.05;                       % Maximum growth rate of coral host (d-1)
+Spart = 3.0;                      % Rate coefficient of particle capture (m d-1)
+uCS = 0.4;                        % Maximum growth rate of zooxanthellae (d-1)
+zetaCH = 0.0; %0.01;              % Quadratic mortality coefficient of polyps (d-1 (g N m-2)-1)
+zetaCS = 0.0;                     % Linear mortality of zooxanthellae (d-1) 
+CHremin = 0.5;                    % Remineralised fraction of coral mortality 
+OCH = 2.0/1000;                   % Nitrogen-specific host area coefficient of polyps (m2 mg N-1)
+C2Chlmin = 20;                    % max Chl:C ratio at which synthesis stops.    
+
+Chlmax = 2.0*2.09e7 * ((1.0e18*CSvol)^-0.310);
+Xanth_tau = 72; % 1 per 20 minutes %%72 times per day
+photon2rcii = 0.1e-6;
+ROSthreshold = 1.418e-14;
+photon2ros = 3500;
+chla2rcii = 0.002/893.49;
+CSmaxbleachrate = 1.0; % d-1
+repair_coefficient = 268; 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % initial conditions:
 
-CS_N0 = 0.4;
-CH_N0 = 1000;
-CS_Chl = CS_N0*5.6786/30/20; % 1/20th of maximum 
+CS_N0 = 1; 
+CH_N0 = 10;
+
+CS_Chl = CS_N0*5.6786/30; % 1/20th of maximum 
 
 y0(1) = CS_N0; 
 y0(2) = CS_N0*0.5;
@@ -38,10 +64,13 @@ y0(8) = CS_Chl*0.2448*0.67;
 
 chla2rcii = 0.002/893.49;
 
-y0(9) = CS_Chl * chla2rcii*0.05;
-y0(10) = CS_Chl * chla2rcii*0.1;
-y0(11) = CS_Chl * chla2rcii*0.85;
-y0(12) = 0.0;
+y0(9) = 5.8013E-10;
+y0(10) = 5.6923E-10;
+y0(11) = 4.5218E-08;
+y0(12) = ROSthreshold*CS_N0/mN*0.5;
+% starting ROS is half the threshold (Suggett, 2018)
+
+
 
 disp('Initial conditions: [CS_N Rn RP RC CH_N Chl Xp Xh Qox Qred Qin ROS]');
 
@@ -49,55 +78,40 @@ y0
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % Input forcings here
+
 % NOTE forcings are overwritten below if file_path is specified
-% temperature timeseries, 1st row is times (in days) 2nd is temperature anamoly
-Temperature = [0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26;
-                    0 0 0 0.7 1.8 2.9 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2.79 1.2 0 0 0 0 0 ]; 
+% temperature timeseries, 1st row is times (in days) 2nd is temperature anomaly
+Temperature = [0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24;
+                    0 0 0 0 0 0 0.3 1.4 2 2.3 3.3 3.6 4.3 3.9 4 4 4.2 3.8 3.1 4 4 4 3.95 3.9 1.9]; 
 
 % Makes Light into a timeseries
-Peak = 1000; %Peak daily sunlight (W/m2)
-Light(1,:) = [tspan(1):1/24:tspan(2)];
+Peak = 300; %Peak daily sunlight (W/m2)
+Light(1,:) = tspan(1):1/24:tspan(2);
 Light(2,:) = Peak*max(0,sin((Light(1,:)-0.25-floor(Light(1,:)-0.25))*2*pi)); % W m-2 
 
-DIN_w = 40.71428571; % (mg N m-3);
-DIP_w = 13.57142857*(1*((1/16)*(30.97/14.01))); % (mg P m-3)       
-POM = 0.0; % Particulate organic matter.
+DIN_w = 41.855; % (mg N m-3);
+DIP_w = 17.9*(1*((1/16)*(30.97/14.01))); % (mg P m-3) 
+
+POM = 0; % Particulate organic matter, this was set as 0 from the first version
 tau = 0.3; % sheer stress at the bottom (N m-2) - values between 0-1
 rho = 1026; % density of the water (kg m-3)
-Salinity = 35;% Note that Salinity is not currently used in this model.
+Salinity = 35; % Note that Salinity is not currently used in this model.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Input options for reading forcing data from files (overwrites above forcing variables)
-% Comment out for normal model usage 
-%file_path = 'C:/Users/Example/Bleaching_submodel/Test_Data/';
-%SDate = datetime(2021,11,28,0,0,0); % Starting datetime [format = (Year,Month,Day,Hour,Minute,Second)]
-%MMM = 26; %Maximum Monthly Mean for the corals you are modelling
+
 % This requires each recorded variable to be saved in individual csv files
 % in the filepath folder, with no other csv files.
+% Comment out for normal model usage 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Input parameters here
-% Parameter values table A.7 in Baird et al. 2018
-mN = 4.514805e-14*16*1000*14.01;  % Nitrogen content of zooxanthellae cells           (mg N cell-1)
-rCS = 5e-6;                        % Radius of zooxanthellae cells                     (m)
-CSvol = 4*pi/3*rCS^3;    % volume of the cell (m3)
-uCH = 0.05;                     % Maximum growth rate of coral host                     (d-1)
-Spart = 3.0;                    % Rate coefficient of particle capture              (m d-1)
-uCS = 0.4;                      % Maximum growth rate of zooxanthellae              (d-1)
-zetaCH = 0.0; %0.01;                  % Quadratic mortality coefficient of polyps         (d-1 (g N m-2)-1)
-zetaCS = 0.0;                  % Linear mortality of zooxanthellae                 (d-1) 
-CHremin = 0.5;                   % Remineralised fraction of coral mortality 
-OCH = 2.0/1000;                      % Nitrogen-specific host area coefficient of polyps (m2 mg N-1)
-C2Chlmin = 20;                  % max Chl:C ratio at which synthesis stops.    
+%file_path = 'C:/Users/sellis27/OneDrive - Southern Cross University/Documents/Southern Cross University/Programs/CSM/Trials/Script_Version/6/2/forcings_data_hot/'; 
+file_path = 'C:/Users/sellis27/OneDrive - Southern Cross University/Documents/Southern Cross University/Programs/CSM/Trials/Script_Version/6/2/forcings_data_cold/'; 
 
-Chlmax = 2.0*2.09e7 * ((1.0e18*CSvol)^-0.310);
-Xanth_tau = 72; % 1 per 20 minutes %%72 times per day
-photon2rcii = 0.1e-6;
-ROSthreshold = 1.418e-14;
-photon2ros = 7000.0;
-chla2rcii = 0.002/893.49;
-CSmaxbleachrate = 1.0; % d-1
-
+SDate = datetime(2022,04,23,0,0,0); % Starting datetime [format = (Year,Month,Day,Hour,Minute,Second)]
+MMM = 28.6; % Maximum Monthly Mean of corals
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -121,10 +135,12 @@ if exist('file_path','var') == 1
     end
     Temperature(2,:) = Temperature(2,:) - MMM;
     Temperature(2,Temperature(2,:)<0) = 0;
+
+
+% repmat(b,1,2)
+
 end
 clear files filenames pth ext i
-
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -146,10 +162,10 @@ for i=1:length(forcings)
         disp(strcat("Error: Forcings variable '",num2str(i),"' has a non finite value"))
             return
     end
-    if length(forcings{i}(1,:)) ~= length(unique(forcings{i}(1,:)))
-        [v, w] = unique( forcings{i}(1,:), 'stable' );
-        duplicate_indices = setdiff( 1:numel(forcings{i}(1,:)), w );
-        disp(strcat("Error: Forcings variable '",num2str(i),"' has a repeated time point ",datestr(datetime((forcings{i}(1,duplicate_indices)+datenum(SDate)),'ConvertFrom','datenum'))))
+    if length(forcings{i}(1,:)) ~= length(unique(forcings{i}(1,:))) %if length of datetime is not equal to unique data points
+        [v, w] = unique( forcings{i}(1,:), 'stable' ); % extract the indices for duplicated points found
+        duplicate_indices = setdiff( 1:numel(forcings{i}(1,:)), w ); 
+        disp(strcat("Error: Forcings variable '",num2str(i),"' has a repeated time point ",datestr(datetime((forcings{i}(1,duplicate_indices)+datenum(SDate)),'ConvertFrom','datenum')))) %return an error message and stop the code, display replicated datetime
         return
     end
 end
@@ -173,16 +189,32 @@ params(15) = ROSthreshold;
 params(16) = photon2ros;
 params(17) = chla2rcii;
 params(18) = CSmaxbleachrate;
-
+params(19) = repair_coefficient;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-opts = odeset('RelTol',1e-8,'AbsTol',1e-8,'MaxStep',60/86400);
+
+% Display some initial conditions before run
+
+% Some calculations
+Aeff = 1 - exp(-OCH * y0(5));
+normalisedprojectedarea =  CS_N0 / mN * pi * rCS * rCS/Aeff; %m2
+
+% Output some settings
+disp(['Projected Area [Norm] = ',num2str(normalisedprojectedarea)])
+disp(['Photons to ROS = ',num2str(photon2ros)])
+disp(['Starting Zoothanthallae Chlorophyll = ',num2str(CS_Chl)])
+disp(['Zoothanthallae Repair Coefficient = ',num2str(repair_coefficient)])
+%disp(['RuBisCo Activity =', num2str(a_rub)])
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+opts = odeset('RelTol',1e-8,'AbsTol',1e-8,'MaxStep',600/86400);
 y00 = y0;
 tstore = [];
 ystore = [];
 for tt = 1:tspan(2)
-    [t,y] = ode45(@Bleach, [tt-1 tt], y00, opts, forcings, params);
+    [t,y] = ode45(@Bleach_7, [tt-1 tt], y00, opts, forcings, params);
     y00 = y(end,:);
     tstore = [tstore; t];
     ystore = [ystore; y];
@@ -196,13 +228,13 @@ y = ystore;
 
 % absorption cross-section (value between 0 and pi r^2)
 
-rCS = 5e-6;mN = 4.514805e-14*16*1000*14.01; 
+% rCS = 5e-6;mN = 4.514805e-14*16*1000*14.01; 
 cells = y(:,1) /mN;CSvol = 4*pi/3*rCS^3;
-C2Chlmin = 20;
-ROSthreshold = 1.418e-14;
-CSmaxbleachrate = 1.0; % d-1
+% C2Chlmin = 20;
+% ROSthreshold = 1.418e-14;
+% CSmaxbleachrate = 1.0; % d-1
 				  
-cellXp = y(:,7)./(cells*CSvol);    % mg pig m-3
+cellXp = y(:,7)./(cells*CSvol);  % mg pig m-3
 cellXh_= y(:,8)./(cells*CSvol);
 cellChl = y(:,6)./(cells*CSvol);
 				  
@@ -216,6 +248,15 @@ ROSpercell = y(:,12)./cells;
 expel = CSmaxbleachrate*max(0.0,(ROSpercell - ROSthreshold)./ROSthreshold)*ROSthreshold;
 
 rctotal = sum(y(:,9:11),2);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+temperatures = interp1(Temperature(1,:),Temperature(2,:),t);
+a_rub = min(1.0,max(0,(1-exp(-(2-temperatures)))/(1-exp(-2)))) ;
+
+Aeff = 1 - exp(-OCH * y(5));
+
+normalisedprojectedarea =  cells * pi * rCS * rCS/Aeff; %m2
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
