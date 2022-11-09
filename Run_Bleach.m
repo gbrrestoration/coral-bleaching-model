@@ -107,8 +107,7 @@ Salinity = 35; % Note that Salinity is not currently used in this model.
 % in the filepath folder, with no other csv files.
 % Comment out for normal model usage 
 
-%file_path = 'C:/Users/sellis27/OneDrive - Southern Cross University/Documents/Southern Cross University/Programs/CSM/Trials/Script_Version/6/2/forcings_data_hot/'; 
-file_path = 'C:/Users/sellis27/OneDrive - Southern Cross University/Documents/Southern Cross University/Programs/CSM/Trials/Script_Version/6/2/forcings_data_cold/'; 
+%file_path = 'C:/Users/Example/Bleaching_submodel/Test_Data/';
 
 SDate = datetime(2022,04,23,0,0,0); % Starting datetime [format = (Year,Month,Day,Hour,Minute,Second)]
 MMM = 28.6; % Maximum Monthly Mean of corals
