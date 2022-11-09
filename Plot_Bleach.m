@@ -87,5 +87,5 @@ legend('opaq','norm Chl:C','norm Ed','Position',[0.7033 0.3773 0.0826 0.0741],'F
 
 %set(gcf,'Position',[106.3333   44.3333  996.0000  586.6667]);
 % insert name of scipt below (%%)
-eval(['print -dpng Run_Bleach_7_',datestr(now,'dd-mmm-yyyy'),'.fig'])
+eval(['print -dpng Run_Bleach_',datestr(now,'dd-mmm-yyyy'),'.fig'])
 		  
