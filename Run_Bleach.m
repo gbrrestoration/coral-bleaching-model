@@ -87,7 +87,7 @@ Temperature = [0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24;
                     0 0 0 0 0 0 0.3 1.4 2 2.3 3.3 3.6 4.3 3.9 4 4 4.2 3.8 3.1 4 4 4 3.95 3.9 1.9]; 
 
 % Makes Light into a timeseries
-Peak = 1000; %Peak daily sunlight (W/m2)
+Peak = 300; %Peak daily sunlight (W/m2)
 Light(1,:) = tspan(1):1/24:tspan(2);
 Light(2,:) = Peak*max(0,sin((Light(1,:)-0.25-floor(Light(1,:)-0.25))*2*pi)); % W m-2 
 
