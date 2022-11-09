@@ -1,4 +1,4 @@
-function dydt = Bleach_7(t, y, forcings, params)
+function dydt = Bleach(t, y, forcings, params)
 
 % developed by Mark Baird and Julie Terp Jorgensen (2021).
 
