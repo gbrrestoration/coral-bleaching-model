@@ -64,9 +64,9 @@ y0(8) = CS_Chl*0.2448*0.67;
 
 chla2rcii = 0.002/893.49;
 
-y0(9) = 5.8013E-10;
-y0(10) = 5.6923E-10;
-y0(11) = 4.5218E-08;
+y0(9) = 8.3213E-11;
+y0(10) = 7.7056E-11;
+y0(11) = 4.2112E-08;
 y0(12) = ROSthreshold*CS_N0/mN*0.5;
 % starting ROS is half the threshold (Suggett, 2018)
 
