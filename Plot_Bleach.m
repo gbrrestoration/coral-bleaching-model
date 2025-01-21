@@ -2,51 +2,51 @@ figure(1)
  
 subplot(231) %Symbiont reserves of N, P, C and zooxanthallae biomass 
 plot(t,y(:,[2:4 1]), 'LineWidth', 2); % y contains 15 variables 
-ylabel('Reserves','FontSize', 12);
+ylabel('Symbiont reserves','FontSize', 12);
 xlabel('Time [d]', 'FontSize', 12);
 ylim = get(gca,'ylim');
 set(gca,'xlim',tspan); %change this to timeframe
 text(0.04,0.99,'A','Units', 'normalized', 'VerticalAlignment', 'Top','FontSize',12)
 title('Symbiont biomass','FontSize', 14);
-legend('RN', 'RP', 'RC','CS_N','Position',[0.17 0.83 0.03 0.06]);
+legend('RN (mg N m^-^2)', 'RP (mg P m^-^2)', 'RC (mg C m^-^2)','CS_N (mg N m^-^2)','Position',[0.17 0.83 0.03 0.06]);
 
 
 subplot(232) %Normalised reserves of N, P, C
 plot(t, [y(:,2)./y(:,1) y(:,3)./y(:,1)/(((1/16)*(30.97/14.01))) y(:,4)./y(:,1)/(((106/16)*(12.01/14.01)))], 'LineWidth', 2);
-ylabel('Normalised reserves','FontSize', 12);
+ylabel('Normalised internal reserves','FontSize', 12);
 xlabel('Time (d)', 'FontSize', 12);
 set(gca,'ylim',[0 1.4]);
 set(gca,'xlim',tspan); %change this to timeframe
 text(0.04,0.99,'B','Units', 'normalized', 'VerticalAlignment', 'Top','FontSize',12)
 title('Normalised Reserves','FontSize', 14);
-legend('N [mg N]', 'P [dimensionless]', 'C [dimensionless]', 'Position',[0.48 0.85 0.03 0.06]);
+legend('N [dimensionless]', 'P [dimensionless]', 'C [dimensionless]', 'Position',[0.48 0.85 0.03 0.06]);
 
 
 subplot(233) %Pigments
 plot(t,y(:,6:8), 'LineWidth', 2); % y contains 15 variables 
-ylabel('Pigments','FontSize', 12);
+ylabel('Pigment concentration','FontSize', 12);
 xlabel('Time (d)', 'FontSize', 12);
 set(gca,'ylim',[0 0.08]);
 set(gca,'xlim',tspan); %change this to timeframe
 text(0.04,0.99,'C','Units', 'normalized', 'VerticalAlignment', 'Top','FontSize',12)
 title('Pigments', 'FontSize', 14);
-legend('Chl', 'Xp','Xh','Position',[0.73 0.85 0.03 0.06]);
+legend('Chla (mg m^-^2)', 'Xp (mg m^-^2)','Xh (mg m^-^2)','Position',[0.73 0.85 0.03 0.06]);
 
  
 subplot(234) %Reaction centre fraction state
 plot(t,y(:,9)./rctotal,t,y(:,10)./rctotal,t,y(:,11)./rctotal, 'LineWidth', 2); % y contains 15 variables 
-ylabel('Fraction in each state','FontSize', 12);
+ylabel('Normalised reaction centre state','FontSize', 12);
 xlabel('Time (d)', 'FontSize', 12);
 ylim = get(gca,'ylim');
 set(gca,'xlim',tspan); %change this to timeframe
 text(0.04,0.99,'D','Units', 'normalized', 'VerticalAlignment', 'Top','FontSize',12)
 title('Reaction centres', 'FontSize', 14);
-legend('Qox', 'Qred', 'Qin','Position',[0.17 0.375 0.03 0.06]);
+legend('Qox (dimensionless)', 'Qred (dimensionless)', 'Qin (dimensionless)','Position',[0.17 0.375 0.03 0.06]);
 
 
 subplot(235) %ROS per cell build-up, ROS expulsion
 plot(t,ROSpercell,t,expel,t,ROSthreshold*ones(size(t)),'LineWidth',2); % y contains 15 variables 
-ylabel('ROS per cell, Expulsion','FontSize', 12);
+ylabel('ROS concentration, Expulsion','FontSize', 12);
 xlabel('Time (d)', 'FontSize', 12);
 set(gca,'ylim',[0 4*1.418e-14]);
 set(gca,'xlim',tspan);
@@ -55,7 +55,7 @@ ylim = get(gca,'ylim');
 %text(xlim(1) + 0.1*diff(xlim),ylim(1) + 0.33*diff(ylim),['Thres = ',num2str(ROSthreshold)]);
 text(0.04,0.99,'E','Units', 'normalized', 'VerticalAlignment', 'Top','FontSize',12)
 title('ROS, Expulsion', 'FontSize', 14);
-legend('ROS','norm expulsion','Threshold', 'Position',[0.47 0.375 0.03 0.06]);
+legend('ROS concentration (mg O cell^-^1)','Symbiont cell expulsion rate (d-1)','Threshold', 'Position',[0.47 0.375 0.03 0.06]);
 
  			 
 subplot(236) % opaqueness of the cell
