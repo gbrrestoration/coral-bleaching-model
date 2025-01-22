@@ -285,7 +285,7 @@ dydt(9) = dydt(9) + dChldt_syn * CSvol * cells * chla2rcii;   					% Ox
 dydt(9) = dydt(9) - C_notfixed + Qi2Qox;                      					% Ox
 dydt(10) = dydt(10) + C_notfixed - absorb * (Qred / Qtot);    					% Red
 dydt(11) = dydt(11) - Qi2Qox + absorb * (Qred / Qtot);        					% In
-dydt(12) = dydt(12) - ARO + 0.5 * (Qin/Qtot) * absorb / photon2rcii / photon2ros / 86400;   	% No loss of ROS from intracellular to extracellular
+dydt(12) = dydt(12) - ARO + 0.5 * (Qin/Qtot) * absorb / photon2rcii / photon2ros / 86400;   	% 50% diffusion of intracellular ROS concentration to extracellular ROS concentration
 						 
 expulsionrate = CSmaxbleachrate*min(1.0,max(0.0,(ROSpercell - ROSthreshold)/ROSthreshold));
 
