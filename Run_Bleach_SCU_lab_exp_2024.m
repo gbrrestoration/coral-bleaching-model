@@ -5,11 +5,12 @@
 % Description: 
 % This process contains a coral model with autotrophic and heterotrophic growth, zooxanthellae physiology, xanthophyll cycle, reaction centre dynamics and reative oxygen build-up.
 
+% This configuration of Run_Bleach was used to run the model for a laboratory experiment
   
 close all 
 clear all
 
-tspan = [0 26]; % Days (integer format)
+tspan = [0 23]; % Days (integer format), adjust as necessary
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Parameter values (Table A.7 in Baird et al. (2018))
@@ -30,7 +31,7 @@ Chlmax = 2.0*2.09e7 * ((1.0e18*CSvol)^-0.310);
 Xanth_tau = 72; 							% 1 per 20 minutes %%72 times per day
 photon2rcii = 0.1e-6;
 ROSthreshold = 1.418e-14;
-photon2ros = 7000.0;
+photon2ros = 3500; 							% Initial condition for the number of photons that lead to the generation of one ROS was reduced in this configuration to represent a thermally sensitive coral species with a less efficient photosynthetic apparatus
 chla2rcii = 0.002/893.49;
 CSmaxbleachrate = 1.0; 							% (d-1)
 repair_coefficient = 268;
@@ -38,11 +39,15 @@ repair_coefficient = 268;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Initial conditions:
+
+% Where adjusted for laboratory experiment see comment
+% See Run_Bleach.m for original initial conditions
+
 % Initial conditions are passed to Bleach.m and then re-calculated at each timepoint
 
-CS_N0 = 0.4;
-CH_N0 = 1000;
-CS_Chl = CS_N0*5.6786/30/20; % 1/20th of maximum 
+CS_N0 = 1;								% Initial condition of symbiont biomass (mg N m-2) was increased to represent a healthy starting state
+CH_N0 = 10;								% Initial condition of coral host biomass (g N m-2) was reduced to be more representative of a laboratory experiment
+CS_Chl = CS_N0*5.6786/30/20; % 1/20th of maximum 			% Initial condition of symbiont chlorophyll a concentration (mg m-2) was increased to represent a healthy starting state
 
 y0(1) = CS_N0; 
 y0(2) = CS_N0*0.5;
@@ -59,10 +64,10 @@ y0(8) = CS_Chl*0.2448*0.67;
 
 chla2rcii = 0.002/893.49;
 
-y0(9) = CS_Chl * chla2rcii*0.05;
-y0(10) = CS_Chl * chla2rcii*0.1;
-y0(11) = CS_Chl * chla2rcii*0.85;
-y0(12) = 0.0;
+y0(9) = 1.0607E-07;							% Initial condition for oxidised reaction centre concentration (mg m-2) obtained from a pre-experimental simulation 
+y0(10) = 7.1695E-09;							% Initial condition for reduced reaction centre concentration (mg m-2) obtained from a pre-experimental simulation 
+y0(11) = 1.0108E-07;							% Initial condition for inhibited reaction centre concentration (mg m-2) obtained from a pre-experimental simulation 
+y0(12) = ROSthreshold*CS_N0/mN*0.5;					% Intitial condition of ROS concentration was set to half the ROS threshold (Suggett, 2008), to reduce the model spin-up time to a stable starting state
 
 disp('Initial conditions: [CS_N Rn RP RC CH_N Chl Xp Xh Qox Qred Qin ROS]');
 
@@ -70,22 +75,24 @@ y0
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Input forcings here
+% Input forcings here:
+
+% Adjust as necessary
 % NOTE forcings are overwritten below if file_path is specified
 
 % Temperature timeseries
 % 1st row is times (in days) 2nd is temperature anomaly:
-Temperature = [0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26;
-                    0 0 0 0.7 1.8 2.9 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2.79 1.2 0 0 0 0 0 ]; 
+Temperature = [0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24;
+                    0 0 0 0 0 0 0.3 1.4 2 2.3 3.3 3.6 4.3 3.9 4 4 4.2 3.8 3.1 4 4 4 3.95 3.9 1.9]; 
 
 % Make Light into a timeseries:
-Peak = 1000; 								% Peak daily sunlight (W/m2)
+Peak = 300; 								% Peak daily sunlight (W/m2); average value supplied from experimental data
 Light(1,:) = tspan(1):1/24:tspan(2);
 Light(2,:) = Peak*max(0,sin((Light(1,:)-0.25-floor(Light(1,:)-0.25))*2*pi)); % W m-2 
 
 % Nutrients:
-DIN_w = 40.71428571; 							% (mg N m-3)
-DIP_w = 13.57142857*(1*((1/16)*(30.97/14.01))); 			% (mg P m-3)       
+DIN_w = 41.855; 							% (mg N m-3); average value supplied from experimental data
+DIP_w = 17.9*(1*((1/16)*(30.97/14.01))); 				% (mg P m-3); average value supplied from experimental data       
 
 POM = 0.0; 								% Particulate organic matter (mg m-3)
 tau = 0.3; 								% Sheer stress at the bottom (N m-2) - values between 0-1
@@ -99,10 +106,10 @@ Salinity = 35;								% Note that Salinity is not currently used in this model.
 % This requires each recorded variable to be saved in individual .csv files in the filepath folder, with no other csv files.
 % Comment out for normal model usage 
 
-% file_path = 'C:/Users/Example/Bleaching_submodel/Test_Data/';
+% file_path = 'C:/Users/Example/Bleaching_submodel/Test_Data/';		% Light, temperature and nutrient forcing data recorded in the laboratory experiment was supplied to the model
 
 % SDate = datetime(2021,11,28,0,0,0); 					% Starting datetime [format = (Year,Month,Day,Hour,Minute,Second)], ensure forcings have a value before this datetime
-% MMM = 26; 								% Maximum Monthly Mean of the corals
+% MMM = 28.6; 								% Maximum Monthly Mean of the corals in laboratory experiment
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -204,7 +211,7 @@ disp(['RuBisCo Activity =', num2str(a_rub)])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-opts = odeset('RelTol',1e-8,'AbsTol',1e-8,'MaxStep',60/86400);
+opts = odeset('RelTol',1e-8,'AbsTol',1e-8,'MaxStep',600/86400);		% Max step increased 
 y00 = y0;
 tstore = [];
 ystore = [];
