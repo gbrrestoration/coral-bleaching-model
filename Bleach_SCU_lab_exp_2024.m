@@ -2,6 +2,9 @@ function dydt = bleach(t, y, forcings, params)
 
 % Developed by Mark Baird and Julie Terp Jorgensen (2021).
 
+% This model version was used for a laboratory experiment
+% Revision: the term for ROS diffusion was removed; all ROS generated contributes to the ROS pool (see line 291)
+
 % Water column environmental conditions:
   
 % Extract 'forcings' variables created in Run_Bleach.m:
@@ -285,7 +288,7 @@ dydt(9) = dydt(9) + dChldt_syn * CSvol * cells * chla2rcii;   					% Ox
 dydt(9) = dydt(9) - C_notfixed + Qi2Qox;                      					% Ox
 dydt(10) = dydt(10) + C_notfixed - absorb * (Qred / Qtot);    					% Red
 dydt(11) = dydt(11) - Qi2Qox + absorb * (Qred / Qtot);        					% In
-dydt(12) = dydt(12) - ARO + 0.5 * (Qin/Qtot) * absorb / photon2rcii / photon2ros / 86400;   	% 50% diffusion of intracellular ROS concentration to extracellular ROS concentration
+dydt(12) = dydt(12) - ARO + (Qin/Qtot) * absorb / photon2rcii / photon2ros / 86400;   		% The term for ROS diffusion was removed; all ROS generated contributes to the ROS pool
 						 
 expulsionrate = CSmaxbleachrate*min(1.0,max(0.0,(ROSpercell - ROSthreshold)/ROSthreshold));
 
