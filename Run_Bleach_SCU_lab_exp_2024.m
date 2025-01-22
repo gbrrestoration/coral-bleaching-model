@@ -43,7 +43,7 @@ repair_coefficient = 268;
 % Where adjusted for laboratory experiment see comment
 % See Run_Bleach.m for original initial conditions
 
-% Initial conditions are passed to Bleach.m and then re-calculated at each timepoint
+% Initial conditions are passed to Bleach_SCU_lab_exp_2024.m and then re-calculated at each timepoint
 
 CS_N0 = 1;								% Initial condition of symbiont biomass (mg N m-2) was increased to represent a healthy starting state
 CH_N0 = 10;								% Initial condition of coral host biomass (g N m-2) was reduced to be more representative of a laboratory experiment
@@ -139,7 +139,7 @@ clear files filenames pth ext i
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Forcings are collated into forcings variable for passing to Bleach.m function:
+% Forcings are collated into forcings variable for passing to Bleach_SCU_lab_exp_2024.m function:
 
 forcings = cell(8,1); 							% This must be the right number of forcings
 forcings{1} = DIN_w;
@@ -151,7 +151,7 @@ forcings{6} = tau;
 forcings{7} = rho;
 forcings{8} = Light;
 
-% Check for non-finite and repeated values in forcings that will break 'Bleach.m' function:
+% Check for non-finite and repeated values in forcings that will break 'Bleach_SCU_lab_exp_2024.m' function:
 
 for i=1:length(forcings)
     if sum(sum(isfinite(forcings{i})<1)) > 0
@@ -167,7 +167,7 @@ for i=1:length(forcings)
     end
 end
 
-% Parameters are collated into forcings variable for passing to Bleach.m function:
+% Parameters are collated into forcings variable for passing to Bleach_SCU_lab_exp_2024.m function:
 
 params(1) = mN;
 params(2) = rCS;
@@ -216,7 +216,7 @@ y00 = y0;
 tstore = [];
 ystore = [];
 for tt = 1:tspan(2)
-    [t,y] = ode45(@Bleach, [tt-1 tt], y00, opts, forcings, params);
+    [t,y] = ode45(@Bleach_SCU_lab_exp_2024, [tt-1 tt], y00, opts, forcings, params);
     y00 = y(end,:);
     tstore = [tstore; t];
     ystore = [ystore; y];
