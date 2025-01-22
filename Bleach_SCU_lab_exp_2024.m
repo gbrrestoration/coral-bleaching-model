@@ -1,4 +1,4 @@
-function dydt = bleach(t, y, forcings, params)
+function dydt = Bleach_SCU_lab_exp_2024(t, y, forcings, params)
 
 % Developed by Mark Baird and Julie Terp Jorgensen (2021).
 
@@ -7,7 +7,7 @@ function dydt = bleach(t, y, forcings, params)
 
 % Water column environmental conditions:
   
-% Extract 'forcings' variables created in Run_Bleach.m:
+% Extract 'forcings' variables created in Run_Bleach_SCU_lab_exp_2024.m:
 
 DIN_w = forcings{1};
 DIP_w = forcings{2};
@@ -34,7 +34,7 @@ clear Fnames dat f
 Ed = Light;
 Tanomaly = Temperature;
 
-% Extract parameters from Run_Bleach.m:
+% Extract parameters from Run_Bleach_SCU_lab_exp_2024.m:
 
 mN = params(1);  			% Nitrogen content of zooxanthellae cells (mg N cell-1)
 rCS = params(2);                	% Radius of zooxanthellae cells (m)
