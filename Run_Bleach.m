@@ -200,7 +200,6 @@ disp(['Projected Area [Norm] = ',num2str(normalisedprojectedarea)])
 disp(['Photons to ROS = ',num2str(photon2ros)])
 disp(['Starting Zoothanthallae Chlorophyll = ',num2str(CS_Chl)])
 disp(['Zoothanthallae Repair Coefficient = ',num2str(repair_coefficient)])
-disp(['RuBisCo Activity =', num2str(a_rub)])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
