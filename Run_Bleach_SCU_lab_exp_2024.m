@@ -52,7 +52,7 @@ CS_Chl = CS_N0*5.6786/30/20; % 1/20th of maximum 			% Initial condition of symbi
 y0(1) = CS_N0; 
 y0(2) = CS_N0*0.5;
 y0(3) = CS_N0*(1*((1/16)*(30.97/14.01)))*0.5;
-y0(4) = CS_N0*(((106/16)*(12.01/14.01)))*0.5;
+y0(4) = CS_N0*((106/16)*(12.01/14.01))*0.5;
 y0(5) = CH_N0;
 
 % The 15 entries where the first 4 are multiplied with CS_N0 
